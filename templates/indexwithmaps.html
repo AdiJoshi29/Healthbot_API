@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/chat.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/typing.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+	<link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../static/css/home.css" />
+    <title>Chatbox</title>
+</head>
+<body>
+    <div class="container-fluid banner">
+		<div class="row">
+			<div class="col-md-12">
+				<nav class="navbar navbar-md">
+					<div class="navbar-brand">AI HEALTHCARE CHATBOT</div>
+					<ul class="nav">
+						<li class="nav-item">
+							<a class="nav-link" onclick="savestate()" href="/">HOME</a>
+						</li>
+                        <li class="nav-item">
+							<a class="nav-link" onclick="savestate()" href="/pred">PREDICTION</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" onclick="savestate()"  href="/map">NEARBY HOSPITALS</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" onclick="savestate()" href="/logout">LOGOUT</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+			<div class="col-md-8 offset-md-2 info">
+				<h1 class="text-center">Virtual Doctor</h1>
+				<p style="color: white;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"class="text-center">
+					A complete solution to your health problems
+				</p>
+				<a href="#" class="btn btn-md text-center">GET STARTED</a>
+				
+			</div>
+		</div>
+	</div>
+    <div class="container">
+        <div class="chatbox">
+            <div class="chatbox__support">
+                <div class="chatbox__header">
+                    <div class="chatbox__image--header">
+                        <img style="max-width: 120px; max-height: 120px;"src="../static/images/ss2.gif" alt="image">
+                    </div>
+                    <div class="chatbox__content--header">
+                        <h4 style=" font-weight: bold;">IBM LEX BOT </h4>
+                        <!-- <p class="chatbox__description--header">HEALTH CARE BOT BUILD USING AMAZOON LEX</p> -->
+                    </div>
+                </div>
+                <div class="chatbox__messages">
+                    <div id="chatsave" class="chat">
+                        
+                        
+                    </div>
+                    
+                    
+                </div>
+                <div class="messages__item messages__item--typing">
+                    <span class="messages__dot"></span>
+                    <span class="messages__dot"></span>
+                    <span class="messages__dot"></span>
+                </div>
+                <div class="chatbox__footer">
+                    <img src="../static/images/icons/emojis.svg" alt="">
+                    <img src="../static/images/icons/microphone.svg" alt="">
+                    <input type="text" id="inputs" type="text" placeholder="Write a message...">
+                    <button style="height:40px;width:60px;font-size: medium;" id="chat_button" onclick="myFunction()"><p class="chatbox__send--footer">Send</p></button>
+                    <img src="../static/images/icons/attachment.svg" alt="">
+                </div>
+            </div>
+            <div class="chatbox__button">
+                <button  >button</button>
+            </div>
+        </div>
+    </div>
+    <script src="../static/js/Chat.js"></script>
+    <script src="../static/js/app.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+
+    
+    <script>
+      $( document ).ready(function() {
+      var saved_state=localStorage.getItem("state");
+      document.getElementById("chatsave").innerHTML=saved_state;
+      console.log( "ready!" );
+
+      });
+      function savestate(){
+        var state = document.getElementById("chatsave").innerHTML;
+        localStorage.setItem("state", state);
+        console.log(state);
+
+      }
+      
+
+        var input = document.getElementById("inputs");
+
+        
+        input.addEventListener("keyup", function(event) {
+        
+        if (event.keyCode === 13) {
+            
+            event.preventDefault();
+            
+            document.getElementById("chat_button").click();
+        }
+        });
+       function myFunction(){
+           
+           input=document.getElementById("inputs").value;
+           if (input==""){
+               return 0;
+           }
+           document.getElementById('inputs').value = '';
+           $(document).ready(function() {
+                $(".chat").append(' <div class="messages__item messages__item--operator">'+input+'</div>');
+            });
+
+            var list=[input];
+            input_chat=JSON.stringify(list);
+
+            $.ajax({
+                        type:'POST',
+                        url:'/chat',
+                        data: input_chat
+                    })
+                    .done(function(data){
+                      if(data=="Sure, on what date would you like me to schedule your online appointment."){
+                        $(".chat").append(' <div class="messages__item messages__item--visitor">'+data+'</div>');
+                        $(".chat").append(' <form id="date" action="/date">');
+                        
+                        $(".chat").append(' <input type="date" id="date_appt" name="appt">');
+                        $(".chat").append(' <br>');
+                        $(".chat").append(' <input type="time" id="time_appt" name="appt">');
+                        $(".chat").append(' <br>');
+                        $(".chat").append(' <button onclick="date_time()" >SUBMIT</button>');
+                        
+                        $(".chat").append(' </form>');
+
+                        
+                      }
+                      else{
+                        
+                        console.log(data);
+                        $(".chat").append(' <div class="messages__item messages__item--visitor">'+data+'</div>');
+                        }
+                    })
+       }
+
+       function date_time()
+        {
+            console.log("hello");
+            
+            var date=document.getElementById("date_appt").value;
+            var time=document.getElementById("time_appt").value;
+            console.log(date);
+            console.log(time);
+            var list=[date,time];
+        dateandtime=JSON.stringify(list);
+        $.ajax({
+                type:'POST',
+                url:'/date',
+                data:dateandtime
+              })
+              .done(function(data){
+                $(".chat").append(' <div class="messages__item messages__item--visitor">'+data+'</div>');
+                
+                        
+                        
+                    })
+        }
+        
+
+
+
+    </script>
+
+</body>
+</html>
